@@ -1,20 +1,109 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-  <img width="300" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
-</div>
-<h2>Here are some links to help you start: </h2>
-<ul>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://github.com/angular/angular-cli/wiki">CLI Documentation</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-  </li>
-</ul>
+<link href="https://unpkg.com/ionicons@4.1.1/dist/css/ionicons.min.css" rel="stylesheet">
+<div class="row">
+  <div *ngIf="identity" class="navigation col-lg-1">
+    <h1 class="head-title">
+      <a [routerLink]="['/']">
+        <i class="icon ion-md-headset"></i>
+        {{title}}
+      </a>
+    </h1>
 
+    <nav id="user_logged">
+
+        <div class="user-image">
+          <img id="image-logged" src="{{url + 'get-image-user/' + identity.image }}"/>
+        </div>
+        <span id="identity_name">
+          {{identity.name}} {{identity.surname}}
+        </span>
+        <a [routerLink]="['/mis-datos']">
+            <!--<span class="glyphicon glyphicon-cog"></span>-->
+            <i class="icon ion-md-settings iconaside"></i>
+            Mis datos
+        </a>
+        <a [routerLink]="['/']" (click)="logout()" class="btn-logout">
+            <i class="icon ion-md-exit iconaside"></i>
+            Salir
+        </a> 
+    </nav>
+  </div>
+
+  <div *ngIf="identity" class="col-lg-11 user-edit">
+    <!--<user-edit></user-edit>-->
+    <router-outlet></router-outlet>
+  </div>
+
+</div>
+
+<div id="login_reg">
+    <div *ngIf="!identity" class="row">
+        <div class="col-lg-6">
+          <h1>Identificate</h1> 
+
+          <div *ngIf="errorMessage">
+            <div class="alert alert-info">
+              <strong>Error </strong>{{errorMessage}}
+            </div>
+          </div>
+
+          <form #loginForm="ngForm" (ngSubmit)="onSubmit()" class="col-lg-6">
+            <p>
+              <label>Correo electónico:</label>
+              <input type="email" #email="ngModel" email="true" name="email" [(ngModel)]="user.email" class="form-control" required/>
+              <div class="form-control-feedback" *ngIf="email.errors && (email.dirty || email.touched)">  
+                  <p *ngIf="email.errors.required">Email requerido</p>  
+                  <p *ngIf="email.errors.email">Deebe introducir un email valido</p>  
+              </div> 
+           
+            <p>
+              <label>Contraseña:</label>
+              <input type="password" #ngpassword="ngModel" name="password" [(ngModel)]="user.password" class="form-control" required/>
+            </p>
+              <input type="submit" value="Entrar" class="btn btn-primary"/>
+      
+          </form>     
+        </div>
+      
+        <div class="col-lg-6">
+          <h1>Registrate</h1>
+          <div *ngIf="alertRegister">
+            <div class="alert alert-info">
+              {{alertRegister}}
+            </div>
+          </div>
+          <form #registerForm="ngForm" (ngSubmit)="onSubmitRegister(); registerForm.reset()" class="col-lg-6">
+            <p>
+              <label>Nombre:</label>
+              <input type="text" #name="ngModel" name="name" [(ngModel)]="user_register.name" class="form-control" required/>
+              <div class="form-control-feedback" *ngIf="name.errors && (name.dirty || name.touched)">  
+                <p *ngIf="name.errors.required">El nombre es obligatorio</p>  
+              </div> 
+            
+            <p>
+              <label>Apellidos:</label>
+              <input type="text" #surname="ngModel" name="surname" [(ngModel)]="user_register.surname"   class="form-control" required/>
+              <div class="form-control-feedback" *ngIf="surname.errors && (surname.dirty || surname.touched)">  
+                <p *ngIf="surname.errors.required">Los apellidos son obligatorios</p>  
+              </div>
+            
+            <p>
+              <label>Correo electónico:</label>
+              <input type="email" #email2="ngModel" email="true" name="email" [(ngModel)]="user_register.email" class="form-control" required/>
+              <div class="form-control-feedback" *ngIf="email2.errors && (email2.dirty || email2.touched)">  
+                <p *ngIf="email2.errors.required">Email requerido</p>  
+                <p *ngIf="email2.errors.email">Deebe introducir un email valido</p>  
+              </div>
+            
+            <p>
+              <label>Contraseña:</label>
+              <input type="password" #password="ngModel" name="password" [(ngModel)]="user_register.password"  class="form-control" required/>
+              <div class="form-control-feedback" *ngIf="password.errors && (password.dirty || password.touched)">  
+                <p *ngIf="password.errors.required">La contraseña es obligatoria</p>  
+              </div>
+            
+            <input type="submit" value="Registrarse" class="btn btn-primary"/>
+          
+          </form>
+        </div>
+    </div>
+</div>

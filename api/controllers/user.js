@@ -83,12 +83,27 @@ function loginUser(req, res){
 function updateUser(req, res){
     var userId = req.params.id;
     var update = req.body;
+
+    if(userId != req.user.sub){
+        return res.status(500).send({message: 'No tienes permisos para actualizar este usuario'});
+    }
+
+     //verifico si tiene avatar, si es asi la eliminaria.
+    if (update.image!='null') {
+        var imagenArchivo = update.image;
+        var path_archivo= './uploads/users/'+imagenArchivo;
+        console.log(imagenArchivo);
+        fs.unlink(path_archivo, (err) => {
+        if (err) throw err;
+            console.log(imagenArchivo+' fue eliminado');
+        });
+    } 
     
     User.findByIdAndUpdate(userId, update, (err, userUpdated) => {
        if(err){
            res.status(500).send({message: 'Error al actualizar el usuario'});
        }else if(!userUpdated){
-           res.status(404).send({message: 'Nose ha podido actualizar el usuario'});
+           res.status(404).send({message: 'No se ha podido actualizar el usuario'});
        }else{
            res.status(202).send({user: userUpdated});
        }
